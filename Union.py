@@ -2,74 +2,46 @@ import re
 import time
 import sys
 
-def checking_special_chr_space(var):
-    for y in var:
-        if len(re.findall("[0-9@a-zA-Z._-]", y)) == 0:
-            return False
-    return True
+def checking_email_except_repetitive_specialchar(string):
 
-
-def checking_first_last_digit(var):
-    if len(re.findall("[0-9a-zA-Z]", var[0])) ==0 or len(re.findall("[0-9a-zA-Z]", var[-1])) ==0:
-        return False
-    else:
-        return True
-
-def checking_gmailsymbols(var):
-    if "." in var and "@" in var and var.count("@")==1:
+    pattern = '^[a-zA-Z0-9][-a-zA-Z0-9._]*[a-zA-Z0-9]@[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]\.[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]$'
+    pattern2 = '^[a-zA-Z0-9]([-a-zA-Z0-9._][a-zA-Z0-9])*@[a-zA-Z0-9]([a-zA-Z0-9-][a-zA-Z0-9])*\.[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]$'
+    if re.match(pattern, string) or re.match(pattern2, string):
         return True
     else:
         return False
 
-def checking_char_around_specialchar(var):
-    if  var[var.rfind("@")-1] in "._-" or var[var.rfind("@")+1] in "._-" :
-        return False
-    elif var[var.rfind(".") - 1] in "._-" or var[var.rfind(".") + 1] in "._-":
-        return False
-    else:
-        return True
-
-def checking_consecutive_specialchar(var):
-    for y in range(len(var)-1):
-        if  var[y] in ".-_" and  var[y+1] in ".-_":
+def checking_consecutive_specialchar(char):
+    for y in range(len(char)-1):
+        if  char[y] in ".-_" and  char[y+1] in ".-_":
             return False
     return True
 
 
 def checking_email(var):
-    if checking_special_chr_space(var) and checking_first_last_digit(var):
-        if checking_gmailsymbols(var) and checking_char_around_specialchar(var):
-            if checking_consecutive_specialchar(var):
-                return True
-    return False
-
-def adding_email_to_hashfunction(email,emails):
-    if email.upper() in emails.values():
-        return False
+    if checking_email_except_repetitive_specialchar(var):
+        if checking_consecutive_specialchar(var):
+            return True
     else:
-        return True
+        return False
 
 def main_function(y):
     with open(y, 'r') as f:
-        emails = {}
-        i = 0
+        emails = []
         for email in f.readlines():
             if checking_email(email.strip()):
-                if adding_email_to_hashfunction(email, emails):
-                    emails[i] = email.upper()
-                    i += 1
+                emails.append(email.upper())
     return emails
 
 def union_function(list1,list2,y):
-    L = list(list2.values())
-    for value in list1.values():
-        if value not in list2.values():
-            L.append(value)
+    emails = {}
+    for value in list1 + list2:
+        emails[value] = 1
 
     with open(y, "w") as f:
-        for i in L:
-            f.write(i + "\n")
-    return L
+        for key in emails.keys():
+            f.write(key + "\n")
+    return emails
 
 
 # main function
@@ -79,14 +51,4 @@ list2 = main_function(sys.argv[2])
 list3 = union_function(list1,list2,sys.argv[3])
 
 end = time.time()
-print(f"L1.txt: {len(list1)} emails, L2.txt: {len(list2)} emails, R.txt: {len(list3)} emails ; Time Taken: {end - start} seconds")
-
-
-
-
-
-
-
-
-
-
+print(f"L1.txt: {len(list1)} emails, L2.txt: {len(list2)} emails, R.txt: {len(list3)} emails; Time Taken: {end - start} seconds")
