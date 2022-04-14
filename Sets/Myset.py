@@ -4,7 +4,7 @@
 
 def union(l1_list, l2_list):
 
-    """Performs union operation on l1_list and l2_file
+    """Performs union operation on l1_list and l2_list
     py:function::
 
     Args:
