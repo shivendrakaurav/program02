@@ -4,11 +4,11 @@
 
 def union(l1_file, l2_file):
 
-    """Performs union operation on list1 and list2
+    """Performs union operation on l1_file and l2_file
     py:function::
 
     Args:
-        list1,list2(list) : lists on which union operation is performed
+        l1_file,ll2_file(list) : lists on which union operation is performed
 
     Returns:
         dictionary: unique emails by adding two lists
@@ -22,11 +22,11 @@ def union(l1_file, l2_file):
 
 def intersection(l1_file, l2_file):
 
-    """Performs intersection operation on list1, list2
+    """Performs intersection operation on l1_file, l2_file
     py:function::
 
     Args:
-        list1,list2(list) : lists on which intersection operation is performed
+        l1_file,l2_file(list) : lists on which intersection operation is performed
 
     Returns:
         dictionary: emails common in both lists
@@ -43,11 +43,11 @@ def intersection(l1_file, l2_file):
 
 def minus(l1_file, l2_file):
 
-    """Performs minus operation of list1 from list2
+    """Performs minus operation of l1_file from l2_file
     py:function::
 
     Args:
-        list1,list2(list): lists on which intersection is performed
+        l1_file,l2_file(list): lists on which intersection is performed
 
     Return:
         dictionary: emails present in only list1
