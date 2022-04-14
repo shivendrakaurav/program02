@@ -4,6 +4,7 @@ import os
 
 
 def read_file(file_name):
+    
     """ open file, checks valid email and add valid email to list.
     py:function::
 
@@ -13,15 +14,17 @@ def read_file(file_name):
     Returns:
         list :  valid emails
     """
+    
     with open(file_name, 'r') as f:
         file = []
         for email in f.readlines():
-            if checking_email(email.strip()):
+            if email_checker(email.strip()):
                 file.append(email.upper())
     return file
 
 
-def write_file(key_value_result, file_name):
+def write_file(key_value_result, file_name ):
+    
     """Opens file_name and write result(dictionary) keys inside it
      py:function::
 
@@ -31,12 +34,14 @@ def write_file(key_value_result, file_name):
     Return:
         None : Does not give any output
     """
+    
     with open(file_name, "w") as f:
         for key in key_value_result.keys():
             f.write(key + "\n")
 
 
 def validate_args(argv_list):
+    
     """checks whether argv_list having 4 values or not, checks whether 2nd and 3rd argv_list values exists and not null.
     py:function::
 
@@ -45,8 +50,8 @@ def validate_args(argv_list):
 
     Return:
         tuple : if argv_list is correct
-
     """
+    
     if (len(argv_list) == 4):
         for x in range(1, 3):
             if not (os.path.exists(argv_list[x])):
@@ -62,55 +67,57 @@ def validate_args(argv_list):
         raise Exception("Usage: python Union.py <in_file1> <in_file2> <result_file>")
 
 
-def checking_email_except_repetitive_specialchar(char):
-    """check whether email is correct or not and do not check special repetitive charachter
+def email_checker_except_repetitive_specialchar(string):
+    
+    """check whether string in coherence with regex funcion or not
     py:function::
 
     Args:
-        char(string) : the string to check
+        string(string) : the string to check
 
     Returns:
-        bool: "True" if email is correct
-
+        bool: "True" if string matches with any of the regex function
     """
-
-    pattern = '^[a-zA-Z0-9][-a-zA-Z0-9._]*[a-zA-Z0-9]@[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]\.[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z]$'
-    pattern2 = '^[a-zA-Z0-9]([-a-zA-Z0-9._][a-zA-Z0-9])*@[a-zA-Z0-9]([a-zA-Z0-9-][a-zA-Z0-9])*\.[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z]$'
-    if re.match(pattern, char) or re.match(pattern2, char):
+    
+    pattern_1 = '^[a-zA-Z0-9][-a-zA-Z0-9._]*[a-zA-Z0-9]@[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]\.[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z]$'
+    pattern_2 = '^[a-zA-Z0-9]([-a-zA-Z0-9._][a-zA-Z0-9])*@[a-zA-Z0-9]([a-zA-Z0-9-][a-zA-Z0-9])*\.[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z]$'
+    if re.match(pattern_1, string) or re.match(pattern_2, string):
         return True
     else:
         return False
 
-def checking_consecutive_specialchar(char):
-    """ Check whether email has consecutive special charachter
+def checking_consecutive_specialchar(email_string):
+    
+    """ Check whether email_string has consecutive special charachter or not
     py:function::
 
     Args:
-        char(str): string to check
+        email_string(str): string to check
 
-    Return:
-        bool: "True" if string has no consecutive special charachter
-
+    Returns:
+        bool: "True" if email_string has no consecutive special charachter
     """
-    for y in range(len(char)-1):
-        if  char[y] in ".-_" and  char[y+1] in ".-_":
+    
+    for postion_of_char in range(len(email_string) - 1):
+        if  email_string[postion_of_char] in ".-_" and  email_string[postion_of_char + 1] in ".-_":
             return False
     return True
 
 
-def checking_email(var):
-    """checking whether email is write or not by combining other two conditions
+def email_checker(email_string):
+    
+    """Checks whether email_string is valid or not
     py:function::
 
     Args:
-        var(str): string to check
+        email_string(str): string to check
 
     Returns:
-        bool: "True" if email is write
-
+        bool: "True" if email is valid
     """
-    if checking_email_except_repetitive_specialchar(var):
-        if checking_consecutive_specialchar(var):
+    
+    if email_checker_except_repetitive_specialchar(email_string):
+        if checking_consecutive_specialchar(email_string):
             return True
     else:
         return False

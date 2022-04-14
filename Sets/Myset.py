@@ -3,6 +3,7 @@
 
 
 def union(l1_file, l2_file):
+
     """Performs union operation on list1 and list2
     py:function::
 
@@ -12,6 +13,7 @@ def union(l1_file, l2_file):
     Returns:
         dictionary: unique emails by adding two lists
     """
+
     key_value_emails = {}
     for key in l1_file + l2_file:
         key_value_emails[key] = 1
@@ -19,6 +21,7 @@ def union(l1_file, l2_file):
 
 
 def intersection(l1_file, l2_file):
+
     """Performs intersection operation on list1, list2
     py:function::
 
@@ -28,6 +31,7 @@ def intersection(l1_file, l2_file):
     Returns:
         dictionary: emails common in both lists
     """
+
     key_value = {}
     key_value_l1 = {}
     for email in l2_file:
@@ -38,6 +42,7 @@ def intersection(l1_file, l2_file):
     return key_value
 
 def minus(l1_file, l2_file):
+
     """Performs minus operation of list1 from list2
     py:function::
 
@@ -47,6 +52,7 @@ def minus(l1_file, l2_file):
     Return:
         dictionary: emails present in only list1
     """
+
     key_value_email={}
     key_value = {}
     for value in l2_file:
