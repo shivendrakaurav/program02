@@ -1,63 +1,62 @@
 import re
-import time
 import sys
 import os
 
 
-def read_file(y):
-    """ checking correctness of email
+def read_file(file_name):
+    """ open file, checks valid email and add valid email to list.
     py:function::
 
     Args:
-        y(file name) : file to check emails
+        file_name(str) : file name from which emails are validated
 
     Returns:
-        list : returns correct emails in list format
+        list :  valid emails
     """
-    with open(y, 'r') as f:
-        emails = []
+    with open(file_name, 'r') as f:
+        file = []
         for email in f.readlines():
             if checking_email(email.strip()):
-                emails.append(email.upper())
-    return emails
+                file.append(email.upper())
+    return file
 
 
-def write_file(result,ret_file):
-    """Write the result of union function
+def write_file(key_value_result, file_name):
+    """Opens file_name and write result(dictionary) keys inside it
      py:function::
 
      Args:
-         result(dictionary) : dictionary to write in ret_file
+         key_value_result(dictionary) : file on which result values are written
 
     Return:
-        None : Does not writing anything
+        None : Does not give any output
     """
-    with open(ret_file, "w") as f:
-        for key in result.keys():
+    with open(file_name, "w") as f:
+        for key in key_value_result.keys():
             f.write(key + "\n")
 
 
-def validate_args(y):
-    """checks whether args entered are correct or not
+def validate_args(argv_list):
+    """checks whether argv_list having 4 values or not, checks whether 2nd and 3rd argv_list values exists and not null.
     py:function::
 
     Args:
-        y(list) : args in list format
+        argv_list(list) : list to check for validity
 
     Return:
-        tuple : return list if argv entered is right
+        tuple : if argv_list is correct
 
     """
-    if (len(sys.argv) == 4):
+    if (len(argv_list) == 4):
         for x in range(1, 3):
-            if not (os.path.exists(y[x])):
-                raise Exception(f"{y[x]} file does not exist")
-            if os.stat(y[x]).st_size == 0 :
-                raise Exception(f"{y[x]} file is empty")
+            if not (os.path.exists(argv_list[x])):
+                raise Exception(f"{argv_list[x]} file does not exist")
+            if os.stat(argv_list[x]).st_size == 0 :
+                raise Exception(f"{argv_list[x]} file is empty")
 
         # if os.stat(y[3]).st_size != 0:
         #     raise Exception(f"{y[3]} is not empty")
-        return y[1], y[2], y[3]
+        return argv_list[1], argv_list[2], argv_list[3]
 
     else:
         raise Exception("Usage: python Union.py <in_file1> <in_file2> <result_file>")
