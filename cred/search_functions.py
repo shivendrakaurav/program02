@@ -1,66 +1,57 @@
-import mysql.connector
-from cred import *
+from MysqlDatabase import MysqlDatabasename
+
+class SearchController(MysqlDatabasename):
+
+    def __init__(self):
+        super().__init__()
+
+    def read_table(self,column_name, operator,patterns):
+
+        self.mycursor.execute(f"SELECT * FROM customers WHERE {column_name} {operator} '{patterns}' ")
+        myresult = self.mycursor.fetchall()
+
+        for x in myresult:
+            print(x)
 
 
-mydb = mysql.connector.connect(
-host="localhost",
-user="root",
-password="shivendrasingh",
-database="customer"
-)
-mycursor = mydb.cursor()
+    def endswith(self):
+        list_input = list(input("Enter search details in this format: <column name> <ending charachter>").split(" "))
+        pattern = "%" + list_input[1]
+        self.read_table(list_input[0] , "LIKE" , pattern)
 
 
+    def startswith(self):
+        list_input = list(input("Enter search details in this format: <column name> <ending charachter>").split(" "))
+        pattern =   list_input[1] +"%"
+        self.read_table(list_input[0] , "LIKE" , pattern)
 
+    def contain(self):
+        list_input = list(input("Enter search details in this format: <column name> <ending charachter>").split(" "))
+        pattern =   "%"  +list_input[1] +"%"
+        self.read_table(list_input[0] , "LIKE" , pattern)
 
+    def id(self):
+        list_input = list(input("Enter search details in this format: <column name> <id>").split(" "))
+        self.mycursor.execute(f"SELECT * FROM customers WHERE {list_input[0]} = {int(list_input[1])} ")
+        myresult = self.mycursor.fetchall()
 
-def read_table(column_name, operator,patterns):
+        for x in myresult:
+            print(x)
 
-    mycursor.execute(f"SELECT * FROM customers WHERE {column_name} {operator} '{patterns}' ")
-    myresult = mycursor.fetchall()
+    def date_after(self):
+        list_input = list(input("Enter search details in this format: <column name> <date after which  data is to fetch>").split(" "))
+        self.read_table(list_input[0] , ">" , list_input[1])
 
-    for x in myresult:
-        print(x)
+    def date_before(self):
+        list_input = list(input("Enter search details in this format: <column name> <date from which before data is to fetch>").split(" "))
+        self.read_table(list_input[0] , "<" , list_input[1])
 
+    def date_between(self):
+        list_input = list(input("Enter search details in this format: <column name> <starting date> <ending date>").split(" "))
+        self.mycursor.execute(f"SELECT * FROM customers WHERE {list_input[0]} BETWEEN '{list_input[1]}' and '{list_input[2]}' ")
+        myresult = self.mycursor.fetchall()
 
-def endswith():
-    list_input = list(input("Enter search details in this format: <column name> <ending charachter>").split(" "))
-    pattern = "%" + list_input[1]
-    read_table(list_input[0] , "LIKE" , pattern)
-
-
-def startswith():
-    list_input = list(input("Enter search details in this format: <column name> <ending charachter>").split(" "))
-    pattern =   list_input[1] +"%"
-    read_table(list_input[0] , "LIKE" , pattern)
-
-def contain():
-    list_input = list(input("Enter search details in this format: <column name> <ending charachter>").split(" "))
-    pattern =   "%"  +list_input[1] +"%"
-    read_table(list_input[0] , "LIKE" , pattern)
-
-def id():
-    list_input = list(input("Enter search details in this format: <column name> <id>").split(" "))
-    mycursor.execute(f"SELECT * FROM customers WHERE {list_input[0]} = {int(list_input[1])} ")
-    myresult = mycursor.fetchall()
-
-    for x in myresult:
-        print(x)
-
-def date_after():
-    list_input = list(input("Enter search details in this format: <column name> <date after which  data is to fetch>").split(" "))
-    read_table(list_input[0] , ">" , list_input[1])
-
-def date_before():
-    list_input = list(input("Enter search details in this format: <column name> <date from which before data is to fetch>").split(" "))
-    read_table(list_input[0] , "<" , list_input[1])
-
-def date_between():
-    list_input = list(input("Enter search details in this format: <column name> <starting date> <ending date>").split(" "))
-    mycursor.execute(f"SELECT * FROM customers WHERE {list_input[0]} BETWEEN '{list_input[1]}' and '{list_input[2]}' ")
-    myresult = mycursor.fetchall()
-
-    for x in myresult:
-        print(x)
+        for x in myresult:
+            print(x)
 
 

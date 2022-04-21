@@ -1,5 +1,4 @@
-from cred import MysqlClass
-from work.cred.search_functions import SearchController
+from cred_functions import MysqlClass
 
 if __name__ == "__main__":
     while True:
@@ -9,29 +8,8 @@ if __name__ == "__main__":
             calling = MysqlClass()
 
             if operation_to_perform.upper() == "SEARCH" :
-                search_object = SearchController()
                 search_type = input("Enter the type of search: <startswith> <endswith> <contain> <id>  <date_after>  <date_before> <date_between>")
                 calling.search(search_type.lower())
-
-
-                if search_type == "endswith":
-                     search_object.search_object.endswith()
-
-                elif search_type == "startswith":
-                     search_object.search_object.startswith()
-                elif search_type == "contain":
-                     search_object.search_object.contain()
-                elif search_type =="id":
-                     search_object.search_object.id()
-                elif search_type == "date_after":
-                    search_object.search_object.date_after()
-                elif search_type == "date_before":
-                     search_object.search_object.date_before()
-                elif search_type == "date_between":
-                     search_object.search_object.date_between()
-                else:
-                    print(f"unknown command {search_type}")
-
                 
             elif  operation_to_perform.upper() == "DELETE":
                 calling.delete()
