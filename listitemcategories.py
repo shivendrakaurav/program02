@@ -9,14 +9,22 @@ class Egoclient():
         'x-api-key': 'da2-orjjngnz3ffc3jjnn75bfm4roi',
         'Content-Type': 'application/json'
         }
-
+        
         with open("payload.txt",'r') as f:
             self.query = f.read()
+       
 
     def post(self):
         items = requests.post(url = self.url ,headers = self.headers, data = self.query )
-        return f"items : {items.text}"
+        print(items.content)
+
+        with open("L3.txt", 'wb') as fd:
+            for chunk in items.iter_content(chunk_size=100):
+                fd.write(chunk)
+                fd.write(b"\n")
+
         
+
     def login(self):
         pass
 
