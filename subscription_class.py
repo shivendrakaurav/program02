@@ -1,10 +1,10 @@
-import requests
 import boto3
-import sys
+import requests
+
 
 class Egoclient():
 
-    def __init__(self):
+    def __init__(self,url = None):
         self.url =  "https://4du5xi23jneq5gmwctl2vl42ty.appsync-api.us-east-1.amazonaws.com/graphql"
 
         # with open("payload.txt","w") as f :
@@ -27,27 +27,41 @@ class Egoclient():
                 }
             )
             self.accesstoken = response['AuthenticationResult']['AccessToken']
+            self.key = 'authorization'
+
+            return self.post()
 
     def read_file(self):
         with open("payload.txt",'r') as f:
             self.query = f.read()
-
+ 
 
     def headers(self):
-        if sys.argv[1] == "subscription" :
-            self.key = 'authorization'
- 
-        elif sys.argv[1] == "list_items" :
-            self.key = 'x-api-key'
-            self.accesstoken =  'da2-orjjngnz3ffc3jjnn75bfm4roi'
-
         headers ={self.key: self.accesstoken
                     ,'content-type': 'application/json'
         }
+        
         return headers
 
     def post(self):
         items = requests.post(url = self.url ,headers = self.headers(), data = self.query )
         return f"items : {items.text}"
     
-    def list_items():
+    
+    def list_items(self):
+        self.url =  "https://ca57f53chjghzmmjskz3e6sptq.appsync-api.us-east-1.amazonaws.com/graphql"
+        self.query = "{\"query\":\"{\\n listItemCategories(limit:1000) {\\n items {\\n id\\n name\\n display_name\\n description\\n status\\n upd_by\\n upd_on\\n }\\n }\\n }\",\"variables\":{}}"
+        self.key = 'x-api-key'
+        self.accesstoken =  'da2-orjjngnz3ffc3jjnn75bfm4roi'
+        return self.post()
+
+
+
+def validate_args(argv_list):
+
+    if (len(argv_list) == 2):
+
+        if argv_list[1] not in ("list_items","subscription") :
+            raise Exception(f"{argv_list[1]}: incorrect operation name ")
+    else:
+        raise Exception("Usage: python subscription.py subscription/list_items")
