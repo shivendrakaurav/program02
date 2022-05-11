@@ -1,52 +1,28 @@
-from cred import MysqlClass
-from work.cred.search_functions import SearchController
+from login_class import Egoclient
+import sys
+from login_class import validate_args
+
 
 if __name__ == "__main__":
-    while True:
-        try:
-            operation_to_perform = input("Enter one of the operation between <SEARCH> <UPDATE> <INSERT > <DELETE> <EXIT> >")
+    
+    try:
+    
+        validate_args(sys.argv)
+        a = Egoclient()
 
-            calling = MysqlClass()
+        if sys.argv[1] == "subscription":
+            credentials = input("Enter id and password: <id> <password>").split(" ")
 
-            if operation_to_perform.upper() == "SEARCH" :
-                search_object = SearchController()
-                search_type = input("Enter the type of search: <startswith> <endswith> <contain> <id>  <date_after>  <date_before> <date_between>")
-                calling.search(search_type.lower())
+            if len(credentials) !=2:
+                raise Exception("Enter credentials are not given in above format")
+
+            a.login(credentials[0], credentials[1])
+            # print(credentials[0])
 
 
-                if search_type == "endswith":
-                     search_object.search_object.endswith()
+        elif sys.argv[1] == "list_items":
+            print(a.list_items())
 
-                elif search_type == "startswith":
-                     search_object.search_object.startswith()
-                elif search_type == "contain":
-                     search_object.search_object.contain()
-                elif search_type =="id":
-                     search_object.search_object.id()
-                elif search_type == "date_after":
-                    search_object.search_object.date_after()
-                elif search_type == "date_before":
-                     search_object.search_object.date_before()
-                elif search_type == "date_between":
-                     search_object.search_object.date_between()
-                else:
-                    print(f"unknown command {search_type}")
-
-                
-            elif  operation_to_perform.upper() == "DELETE":
-                calling.delete()
-                
-            elif  operation_to_perform.upper() == "INSERT":
-                calling.insert()
-
-            elif  operation_to_perform.upper() == "UPDATE":
-                calling.update()
-
-            elif operation_to_perform.upper() == "EXIT":
-                break
-
-            else:
-                print(f'Unknown command, {operation_to_perform}')
-                
-        except Exception as e1:
-            print("Generic error: {0}".format(e1))
+    except Exception as e1:
+        # raise e1
+        print(f"Generic error : {e1}")
