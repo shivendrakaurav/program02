@@ -2,6 +2,7 @@ import requests
 import json
 import sys, os, base64, datetime, hashlib, hmac 
 from pycognito import aws_srp
+import time
 
 
 class Egoclient(): 
@@ -14,13 +15,14 @@ class Egoclient():
 
         if sys.argv[1].lower() in ("list_items"):
             self.url = "https://ca57f53chjghzmmjskz3e6sptq.appsync-api.us-east-1.amazonaws.com/graphql"
-        elif sys.argv[1].lower() in ("add_to_cart"):
+        elif sys.argv[1].lower() in ("cart_details","add_to_cart"):
             self.url = "https://m76jgm5mv5a5ta56kwht6e6ipm.appsync-api.us-east-1.amazonaws.com/graphql"
         else:
             self.url = "https://4du5xi23jneq5gmwctl2vl42ty.appsync-api.us-east-1.amazonaws.com/graphql"
 
-    def add_to_cart(self):   
-        self.accesstoken = self.generate_token()            
+
+    def cart_details(self):   
+        self.accesstoken = self.generate_token()        
         self.content_type = '"text/plain;charset=UTF-8"'
         self.query =  "query ($customer_id: ID!){\n    listCarts(filter: {customer_id: {eq: $customer_id},pay_status:{eq:\"UNPAID\"}}) {\n    items {\n      customer_id\n      customer_mobile\n      customer_name\n      id\n      ciid\n      grand_total\n      pay_status\n      item {\n        defaultimg_url\n        item_name\n        tax_methods\n        uom_name\n        category\n        item_id\n        sub_total\n        qty\n        tax_amount\n        subscription {\n          address {\n            aline1\n            aline2\n            city\n            tag\n            landmark\n            postalcode\n          }\n          isDelivery\n          meal_type\n          notes\n          order_dates\n          sale_val\n        }\n        variants {\n          display_name\n          items {\n            display_name\n          }\n        }\n      }\n    }\n    grand_total\n  }\n}"
         payload = {
@@ -32,22 +34,51 @@ class Egoclient():
         self.key = 'authorization'                       
         return self.post()
 
+    
+    def add_to_cart(self):
+        self.accesstoken = self.generate_token()
+
+        start = time.time()
+        self.key = "authorization"
+        self.content_type = "text/plain;charset=UTF-8"
+        payload = {
+            "query": "mutation ($input: CreateCartInput!){\n              createCart(input: $input) {\n                id\n                customer_id\n              }\n            }",
+            "variables":{"input":{"customer_id":"22906fac-fcfc-4016-b041-1b66171305c4","item":{"item_id":"7d721055-b8f9-45b0-b3b4-23e591d4e39b","qty":1,"subscription":[{"address":{},"addon_items":[],"isDelivery":False,"meal_type":"B","notes":"","order_dates":[]}],"variants":[{"display_name":"Duration","items":{"display_name":"1 day sampler"}}]}}}}
+
+        self.payload = json.dumps(payload)
+        customer_details = self.post()
+        end = time.time()
+
+        print(f"addindg items to cart: {end - start}") 
+        return customer_details
+
+    def list_subscriptions(self):
+        self.accesstoken = self.generate_token() 
+        with open("payload.txt",'r') as f:
+            self.payload = f.read()
+        self.key = 'authorization' 
+        self.content_type = 'application/json'
+        return self.post()
+    
+    def list_items(self):
+        self.payload = "{\"query\":\"{\\n listItemCategories(limit:1000) {\\n items {\\n id\\n name\\n display_name\\n description\\n status\\n upd_by\\n upd_on\\n }\\n }\\n }\",\"variables\":{}}"
+        self.key = 'x-api-key'
+        self.accesstoken =  'da2-orjjngnz3ffc3jjnn75bfm4roi'
+        self.content_type = "application/json"
+        return self.post()
+
+    def post(self):
+        headers ={self.key: self.accesstoken
+                    ,'content-type': self.content_type
+        } 
+        items = requests.post(url = self.url ,headers = headers, data = self.payload )
+        return f"items : {items.content}"
+
     def generate_token(self):
         srp_token = self.srp_A() 
         response_first_call = self.first_request_call(srp_token)
         response_second_call = self.second_request_call(response_first_call)
         return response_second_call["AuthenticationResult"]["AccessToken"]
-
-    def list_subscriptions(self):
-        self.accesstoken = self.generate_token() 
-        self.read_file()
-        self.key = 'authorization' 
-        self.content_type = 'application/json'
-        return self.post()
-
-    def read_file(self):
-        with open("payload.txt",'r') as f:
-            self.payload = f.read()
  
     def srp_A(self) :
 
@@ -98,7 +129,6 @@ class Egoclient():
         hmac_obj = hmac.new(hkdf, msg, digestmod=hashlib.sha256)
         pass_claim_signature = base64.standard_b64encode(hmac_obj.digest())
         
- 
         url = "https://cognito-idp.us-east-1.amazonaws.com/"
 
         headers = {
@@ -121,25 +151,11 @@ class Egoclient():
         print(f"response 2 : {response.status_code}")
         return response.json()
 
-    def post(self):
-        headers ={self.key: self.accesstoken
-                    ,'content-type': self.content_type
-        } 
-        items = requests.post(url = self.url ,headers = headers, data = self.payload )
-        return f"items : {items.content}"
-    
-    
-    def list_items(self):
-        self.payload = "{\"query\":\"{\\n listItemCategories(limit:1000) {\\n items {\\n id\\n name\\n display_name\\n description\\n status\\n upd_by\\n upd_on\\n }\\n }\\n }\",\"variables\":{}}"
-        self.key = 'x-api-key'
-        self.accesstoken =  'da2-orjjngnz3ffc3jjnn75bfm4roi'
-        self.content_type = "application/json"
-        return self.post()
 
 def validate_args(argv_list):
 
     if (len(argv_list) == 2):
-        if argv_list[1] not in ("add_to_cart","list_subscriptions","list_items") :
+        if argv_list[1] not in ("cart_details","list_subscriptions","list_items","add_to_cart") :
             raise Exception(f"{argv_list[1]}: incorrect operation name")
     else:
-        raise Exception("Usage: python main.py <add_to_cart/list_subscriptions/list_items>")
+        raise Exception("Usage: python main.py <cart_details/add_to_cart/list_subscriptions/list_items>")
