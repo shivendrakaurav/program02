@@ -3,7 +3,7 @@ import json
 import sys, os, base64, datetime, hashlib, hmac 
 from pycognito import aws_srp
 import time
-
+import os
 
 def generate_token(username = None,password=None):
         srp_token = srp_A(username,password) 
@@ -11,14 +11,14 @@ def generate_token(username = None,password=None):
         response_second_call = second_request_call(response_first_call)
         return response_second_call["AuthenticationResult"]["AccessToken"]
 
-def srp_A(self) :
+def srp_A(user,passw) :
 
     aws = aws_srp.AWSSRP(
-    username=self.username,
-    password=self.password,
-    pool_id='us-east-1_LmIBVgrWX',
-    client_id='1elqc1ok4eqb1c9sjlhhiq74sd',
-    pool_region='us-east-1'
+    username=user,
+    password=passw,
+    pool_id=os.environ['USER_POOLID'],
+    client_id=os.environ['CLIENT_ID'],
+    pool_region=os.environ['POOL_REGION']
     )
 
     srp_a = aws.get_auth_params()['SRP_A']
@@ -81,3 +81,11 @@ def second_request_call(self,response):
     response = requests.post(url, headers=headers, data=paylaod)
     print(f"response 2 : {response.status_code}")
     return response.json()
+
+def validate_args(argv_list):
+
+    if (len(argv_list) == 2):
+        if argv_list[1] not in ("cart_details","list_subscriptions","list_items","add_to_cart") :
+            raise Exception(f"{argv_list[1]}: incorrect operation name")
+    else:
+        raise Exception("Usage: python main.py <cart_details/add_to_cart/list_subscriptions/list_items>")

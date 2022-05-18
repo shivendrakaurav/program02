@@ -1,0 +1,1 @@
+{"query":"{\n listItemCategories(limit:1000) {\n items {\n id\n name\n display_name\n description\n status\n upd_by\n upd_on\n }\n }\n }","variables":{}}

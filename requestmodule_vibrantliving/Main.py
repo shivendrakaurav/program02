@@ -15,6 +15,7 @@ if __name__ == "__main__":
             if len(credentials) !=2:
                 raise Exception("Entered credentials are not given in above format")
             a = Egoclient(credentials[0], credentials[1])
+            
 
             if sys.argv[1].lower() =="cart_details" :
                 print(a.cart_details()) 

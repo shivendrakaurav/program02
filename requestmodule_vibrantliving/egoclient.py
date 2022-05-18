@@ -10,24 +10,28 @@ class Egoclient():
     def __init__(self,username=None,password=None):
         self.username = username
         self.password = password
-        self.clientid = "1elqc1ok4eqb1c9sjlhhiq74sd"
-        self.userpoolid = "us-east-1_LmIBVgrWX"
+        self.clientid = os.environ['CLIENT_ID']                #storing client id in os 
+        self.userpoolid = os.environ['USER_POOLID']            #storing userpool id in os
+        self.customer_id = os.environ['CUSTOMER_ID']
+        self.pool_region = os.environ['POOL_REGION']
 
+        #storing url in os
         if sys.argv[1].lower() in ("list_items"):
-            self.url = "https://ca57f53chjghzmmjskz3e6sptq.appsync-api.us-east-1.amazonaws.com/graphql"
+            self.url =  os.environ['LIST_ITEM_URL']
         elif sys.argv[1].lower() in ("cart_details","add_to_cart"):
-            self.url = "https://m76jgm5mv5a5ta56kwht6e6ipm.appsync-api.us-east-1.amazonaws.com/graphql"
+            self.url = os.environ['CART_URL']
         else:
-            self.url = "https://4du5xi23jneq5gmwctl2vl42ty.appsync-api.us-east-1.amazonaws.com/graphql"
+            self.url = os.environ['SUBSCRIPTION_URL']
 
 
     def cart_details(self):   
         self.accesstoken = self.generate_token()        
-        self.content_type = '"text/plain;charset=UTF-8"'
-        self.query =  "query ($customer_id: ID!){\n    listCarts(filter: {customer_id: {eq: $customer_id},pay_status:{eq:\"UNPAID\"}}) {\n    items {\n      customer_id\n      customer_mobile\n      customer_name\n      id\n      ciid\n      grand_total\n      pay_status\n      item {\n        defaultimg_url\n        item_name\n        tax_methods\n        uom_name\n        category\n        item_id\n        sub_total\n        qty\n        tax_amount\n        subscription {\n          address {\n            aline1\n            aline2\n            city\n            tag\n            landmark\n            postalcode\n          }\n          isDelivery\n          meal_type\n          notes\n          order_dates\n          sale_val\n        }\n        variants {\n          display_name\n          items {\n            display_name\n          }\n        }\n      }\n    }\n    grand_total\n  }\n}"
+        self.content_type = '"text/plain;charset=UTF-8"'        
+        with open("cart_query.txt","r") as f:
+            self.query = f.read()
         payload = {
             "query" : self.query,
-            "variables" :{"customer_id": "22906fac-fcfc-4016-b041-1b66171305c4"
+            "variables" :{"customer_id": self.customer_id
             }
         }
         self.payload = json.dumps(payload)   
@@ -43,7 +47,7 @@ class Egoclient():
         self.content_type = "text/plain;charset=UTF-8"
         payload = {
             "query": "mutation ($input: CreateCartInput!){\n              createCart(input: $input) {\n                id\n                customer_id\n              }\n            }",
-            "variables":{"input":{"customer_id":"22906fac-fcfc-4016-b041-1b66171305c4","item":{"item_id":"7d721055-b8f9-45b0-b3b4-23e591d4e39b","qty":1,"subscription":[{"address":{},"addon_items":[],"isDelivery":False,"meal_type":"B","notes":"","order_dates":[]}],"variants":[{"display_name":"Duration","items":{"display_name":"1 day sampler"}}]}}}}
+            "variables":{"input":{"customer_id":self.customer_id,"item":{"item_id":"7d721055-b8f9-45b0-b3b4-23e591d4e39b","qty":1,"subscription":[{"address":{},"addon_items":[],"isDelivery":False,"meal_type":"B","notes":"","order_dates":[]}],"variants":[{"display_name":"Duration","items":{"display_name":"1 day sampler"}}]}}}}
 
         self.payload = json.dumps(payload)
         customer_details = self.post()
@@ -54,14 +58,16 @@ class Egoclient():
 
     def list_subscriptions(self):
         self.accesstoken = self.generate_token() 
-        with open("payload.txt",'r') as f:
+        with open("subscription_payload.txt",'r') as f:
             self.payload = f.read()
         self.key = 'authorization' 
         self.content_type = 'application/json'
         return self.post()
     
     def list_items(self):
-        self.payload = "{\"query\":\"{\\n listItemCategories(limit:1000) {\\n items {\\n id\\n name\\n display_name\\n description\\n status\\n upd_by\\n upd_on\\n }\\n }\\n }\",\"variables\":{}}"
+        with open("list_payload.txt","r") as f :
+            self.payload = f.read()
+        
         self.key = 'x-api-key'
         self.accesstoken =  'da2-orjjngnz3ffc3jjnn75bfm4roi'
         self.content_type = "application/json"
@@ -85,9 +91,9 @@ class Egoclient():
         self.aws = aws_srp.AWSSRP(
         username=self.username,
         password=self.password,
-        pool_id='us-east-1_LmIBVgrWX',
-        client_id='1elqc1ok4eqb1c9sjlhhiq74sd',
-        pool_region='us-east-1'
+        pool_id=os.environ['USER_POOLID'],
+        client_id=os.environ['CLIENT_ID'] ,
+        pool_region=self.pool_region
         )
 
         srp_a =self.aws.get_auth_params()['SRP_A']
