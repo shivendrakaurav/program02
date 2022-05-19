@@ -1,7 +1,6 @@
 from egoclient import Egoclient
 import sys
-from egoclient import validate_args
-
+from utils import generate_token,validate_args
 
 if __name__ == "__main__":
     
@@ -14,14 +13,14 @@ if __name__ == "__main__":
             credentials = input("Enter credentials: <phone number> <password>").split(" ")
             if len(credentials) !=2:
                 raise Exception("Entered credentials are not given in above format")
-            a = Egoclient(credentials[0], credentials[1])
-            
+            a = Egoclient()
+            access_token = generate_token(credentials[0], credentials[1])         
 
             if sys.argv[1].lower() =="cart_details" :
-                print(a.cart_details()) 
+                print(a.cart_details(access_token)) 
             elif  sys.argv[1].lower() =="add_to_cart":
-                print(a.add_to_cart()) 
+                print(a.add_to_cart(access_token)) 
             else:
-                print(a.list_subscriptions()) 
+                print(a.list_subscriptions(access_token)) 
     # except Exception as e1:
     #     print(f"Generic error : {e1}")
